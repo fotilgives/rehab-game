@@ -16,7 +16,6 @@ import {
   Activity,
   ShieldCheck
 } from 'lucide-react';
-import ZoomImage from './ZoomImage';
 import SmartImage from './SmartImage';
 
 // ─── Scrolling ticker ────────────────────────────────────────────────────────
@@ -194,7 +193,7 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
   );
 
   return (
-    <section id="top" className="relative overflow-x-hidden">
+    <section id="top" className="relative">
 
       {/* ── Background (shared) ───────────────────────────── */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50/20" />
@@ -217,71 +216,59 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
         {/* ════════════════════════════════════════════════════
             MOBILE layout (hidden on lg+)
         ═════════════════════════════════════════════════════ */}
-        <div className="lg:hidden pt-6 pb-10 space-y-6">
+        <div className="lg:hidden pt-6 pb-10 space-y-6" style={{ touchAction: 'pan-y' }}>
 
-          {/* ── Profile banner card ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-700 p-6 text-white shadow-2xl shadow-emerald-900/15"
-          >
-            {/* Soft glow blob */}
-            <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-8 -left-8 h-36 w-36 rounded-full bg-teal-400/20 blur-2xl" />
+          {/* ── Profile banner card: Large premium portrait (identical to PC style) ── */}
+          <div className="relative overflow-hidden rounded-[1.75rem] shadow-2xl shadow-emerald-950/10 ring-1 ring-white/80">
+            <SmartImage
+              src="/images/about.jpg"
+              alt="Володимир Мальцев — масажист-реабілітолог"
+              className="w-full aspect-[4/5] object-cover"
+              fallback={
+                <div className="flex h-[320px] w-full items-center justify-center bg-slate-100 text-6xl">
+                  👨‍⚕️
+                </div>
+              }
+            />
 
-            {/* Availability badge */}
-            <div className="mb-4 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold text-emerald-50 ring-1 ring-white/20">
-                <CalendarCheck className="h-3 w-3" />
+            {/* Availability badge (Top Left) */}
+            <div className="absolute top-4 left-4 z-10">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/40 backdrop-blur px-3 py-1.5 text-[11px] font-bold text-white ring-1 ring-white/20">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                 Запис відкрито
               </span>
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
             </div>
 
-            {/* Photo + Name row */}
-            <div className="flex items-center gap-4">
-              {/* Circular photo */}
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full ring-4 ring-white/30 shadow-xl bg-slate-100">
-                <SmartImage
-                  src="/images/about.jpg"
-                  alt="Володимир Мальцев"
-                  className="h-full w-full object-cover"
-                  fallback={
-                    <div className="flex h-full w-full items-center justify-center bg-white/20 text-3xl">
-                      👨‍⚕️
+            {/* Stat pill (Top Right) */}
+            <div className="absolute -right-1 -top-1 z-20 scale-85 origin-top-right glass rounded-2xl px-4 py-3 text-center shadow-xl ring-1 ring-white/80">
+              <div className="text-2xl font-black leading-none text-emerald-600">15+</div>
+              <div className="mt-1 text-[9px] font-bold uppercase tracking-widest text-slate-400 leading-none">
+                років
+                <br />
+                досвіду
+              </div>
+            </div>
+
+            {/* Name + Title overlay at bottom (identical to PC card) */}
+            <div className="absolute bottom-0 left-0 right-0 z-10 p-4">
+              <div className="glass rounded-2xl px-4 py-3 ring-1 ring-white/70 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+                  <div>
+                    <div className="text-sm font-extrabold text-slate-900 leading-tight">
+                      Володимир Мальцев
                     </div>
-                  }
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-black leading-tight">
-                  Володимир
-                  <br />
-                  Мальцев
-                </h1>
-                <div className="mt-1 text-sm font-semibold text-emerald-200">
-                  Масажист-реабілітолог
-                </div>
-                <div className="mt-1.5 flex items-center gap-1 text-xs text-emerald-200/80">
-                  <MapPin className="h-3 w-3" />
-                  Вінниця, Україна
+                    <div className="text-[11px] font-semibold text-slate-500 mt-0.5">
+                      Масажист-реабілітолог
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Subtitle */}
-            <div className="mt-4 text-[10px] font-bold text-emerald-200/70 uppercase tracking-widest">
-              ✦ РУХ · БАЛАНС · ВІДНОВЛЕННЯ ✦
-            </div>
-          </motion.div>
+          </div>
 
           {/* ── Stats row ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.55 }}
-            className="grid grid-cols-3 gap-3"
+          <div className="grid grid-cols-3 gap-3"
           >
             {STATS.map((s) => {
               const Icon = s.icon;
@@ -297,27 +284,17 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
                 </div>
               );
             })}
-          </motion.div>
+          </div>
 
           {/* ── Bio text ── */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-sm leading-relaxed text-slate-600"
-          >
+          <p className="text-sm leading-relaxed text-slate-600">
             Спеціаліст із фізичної реабілітації з понад{' '}
             <b className="text-slate-800">15 роками практичного досвіду</b>. Допомагаю відновити{' '}
             <b className="text-slate-800">свободу руху та баланс всього тіла</b>, працюючи з першопричиною больового синдрому.
-          </motion.p>
+          </p>
 
           {/* ── Credential badges ── */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
-            className="flex flex-wrap gap-2"
-          >
+          <div className="flex flex-wrap gap-2">
             {BADGES.map((b) => {
               const Icon = b.icon;
               return (
@@ -330,15 +307,10 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
                 </span>
               );
             })}
-          </motion.div>
+          </div>
 
           {/* ── Expandable cards ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="space-y-2.5"
-          >
+          <div className="space-y-2.5">
             {CARDS.map((card) => (
               <ExpandCard
                 key={card.id}
@@ -347,16 +319,12 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
                 onToggle={() => toggle(card.id)}
               />
             ))}
-          </motion.div>
+          </div>
 
           {/* ── CTAs ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.5 }}
-          >
+          <div>
             {CTAs}
-          </motion.div>
+          </div>
         </div>
 
         {/* ════════════════════════════════════════════════════
@@ -396,11 +364,15 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
 
               {/* Photo */}
               <div className="relative z-10 overflow-hidden rounded-[1.75rem] shadow-2xl shadow-emerald-950/10 ring-1 ring-white/80">
-                <ZoomImage
+                <SmartImage
                   src="/images/about.jpg"
                   alt="Володимир Мальцев — масажист-реабілітолог"
-                  caption="Фото Володимира Мальцева"
-                  ratio="aspect-[3/4]"
+                  className="w-full aspect-[3/4] object-cover"
+                  fallback={
+                    <div className="flex h-[400px] w-full items-center justify-center bg-slate-100 text-6xl">
+                      👨‍⚕️
+                    </div>
+                  }
                 />
                 {/* Name badge */}
                 <div className="absolute bottom-0 left-0 right-0 z-10 p-4">
@@ -527,12 +499,8 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
         {/* ════════════════════════════════════════════════════
             SCROLLING TICKER (all screens)
         ═════════════════════════════════════════════════════ */}
-        <div className="relative overflow-hidden border-y border-slate-100 bg-white/50 py-3 backdrop-blur-sm">
-          <motion.div
-            className="flex gap-8 whitespace-nowrap"
-            animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-          >
+        <div className="relative overflow-hidden border-y border-slate-100 bg-white py-3">
+          <div className="ticker-container flex gap-8 whitespace-nowrap">
             {/* Doubled for seamless loop */}
             {[...TICKER, ...TICKER].map((item, i) => (
               <span key={i} className="shrink-0 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center">
@@ -540,7 +508,7 @@ const Hero: React.FC<Props> = ({ onPlay }) => {
                 <span className="mx-4 text-emerald-300 font-bold">·</span>
               </span>
             ))}
-          </motion.div>
+          </div>
         </div>
 
         {/* ════════════════════════════════════════════════════
