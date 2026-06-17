@@ -74,13 +74,11 @@ const Services: React.FC = () => {
             М'яко, усвідомлено та з турботою про тіло. Підходить як початківцям, так і тим, хто хоче поглибити практику.
           </p>
         </div>
-        <div className="relative w-full overflow-hidden rounded-3xl aspect-[3/4] sm:aspect-auto">
-          <ZoomImage
-            src="/images/yoga.jpg"
-            alt="Курс з йоги"
-            className="absolute inset-0 h-full w-full shadow-xl shadow-emerald-900/10 ring-1 ring-white/60"
-          />
-        </div>
+        <ZoomImage
+          src="/images/yoga.jpg"
+          alt="Курс з йоги"
+          ratio="aspect-[3/4]"
+        />
       </motion.div>
 
       <div className="mt-9 grid gap-5 sm:grid-cols-2">
