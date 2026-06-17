@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, Gift, Check, Ticket, Heart, FileText, Sparkles, Award } from 'lucide-react';
+import { Coins, Gift, Check } from 'lucide-react';
 import type { Account } from '../../hooks/useAccount';
 import AnimatedNumber from '../AnimatedNumber';
 
@@ -12,12 +12,12 @@ interface Props {
 }
 
 const REWARDS = [
-  { icon: Ticket, title: 'Знижка 50% на масаж', cost: 500 },
-  { icon: Heart, title: 'Сеанс масажу', cost: 1500 },
-  { icon: Gift, title: 'Подарунковий сертифікат', cost: 1000 },
-  { icon: Award, title: 'Підписка на курс з йоги', cost: 2000 },
-  { icon: FileText, title: 'Сертифікат на послуги', cost: 1200 },
-  { icon: Sparkles, title: 'Корисний бонус / товар', cost: 300 },
+  { emoji: '🎟️', title: 'Знижка 50% на масаж', cost: 500 },
+  { emoji: '💆', title: 'Сеанс масажу', cost: 1500 },
+  { emoji: '🎁', title: 'Подарунковий сертифікат', cost: 1000 },
+  { emoji: '🧘', title: 'Підписка на курс з йоги', cost: 2000 },
+  { emoji: '📜', title: 'Сертифікат на послуги', cost: 1200 },
+  { emoji: '✨', title: 'Корисний бонус / товар', cost: 300 },
 ];
 
 const Prizes: React.FC<Props> = ({ account, onTopUp, embedded = false }) => {
@@ -47,7 +47,7 @@ const Prizes: React.FC<Props> = ({ account, onTopUp, embedded = false }) => {
       <div className="text-center">
         {!embedded && (
           <>
-            <span className="eyebrow">Призи</span>
+            <span className="eyebrow">🎁 Призи</span>
             <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Обмін монет на призи</h1>
           </>
         )}
@@ -62,7 +62,6 @@ const Prizes: React.FC<Props> = ({ account, onTopUp, embedded = false }) => {
       <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {REWARDS.map((r, i) => {
           const enough = account.balance >= r.cost;
-          const PrizeIcon = r.icon;
           return (
             <motion.div
               key={r.title}
@@ -73,11 +72,9 @@ const Prizes: React.FC<Props> = ({ account, onTopUp, embedded = false }) => {
               whileHover={{ y: -5 }}
               className="card-glow flex flex-col rounded-3xl p-6 ring-1 ring-white/60"
             >
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-600">
-                <PrizeIcon className="h-6 w-6" />
-              </div>
-              <h2 className="mt-4 flex-1 text-lg font-bold text-slate-900 leading-snug">{r.title}</h2>
-              <div className="mt-4 flex items-center gap-1.5 text-emerald-600">
+              <div className="text-4xl">{r.emoji}</div>
+              <h2 className="mt-3 flex-1 text-lg font-bold text-slate-900">{r.title}</h2>
+              <div className="mt-3 flex items-center gap-1.5 text-emerald-600">
                 <Coins className="h-4 w-4" />
                 <span className="text-xl font-extrabold">{r.cost}</span>
                 <span className="text-sm text-slate-400">монет</span>
@@ -114,7 +111,7 @@ const Prizes: React.FC<Props> = ({ account, onTopUp, embedded = false }) => {
             className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-2xl"
           >
             <Check className="h-5 w-5" />
-            Готово! «{claimed}» - заявку прийнято
+            Готово! «{claimed}» - заявку прийнято <Gift className="h-4 w-4" />
           </motion.div>
         )}
       </AnimatePresence>

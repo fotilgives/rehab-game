@@ -30,7 +30,7 @@ const HowItWorks: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center text-center"
       >
-        <span className="eyebrow">Як це працює</span>
+        <span className="eyebrow">✨ Як це працює</span>
         <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
           Три кроки до гри
         </h2>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, User, Phone, Smartphone, Check } from 'lucide-react';
+import { MessageCircle, X, Send, User } from 'lucide-react';
 
 interface FormState {
   name: string;
@@ -11,20 +11,20 @@ interface FormState {
 const contacts = [
   {
     label: 'Telegram',
-    icon: Send,
+    emoji: '✈️',
     href: 'https://t.me/your_handle',
     bg: 'bg-sky-50 text-sky-700 ring-sky-200 hover:bg-sky-100',
   },
   {
     label: 'Viber',
-    icon: Smartphone,
-    href: 'viber://chat?number=%2B380638069916',
+    emoji: '📱',
+    href: 'viber://chat?number=%2B380XXXXXXXXX',
     bg: 'bg-violet-50 text-violet-700 ring-violet-200 hover:bg-violet-100',
   },
   {
     label: 'Телефон',
-    icon: Phone,
-    href: 'tel:+380638069916',
+    emoji: '📞',
+    href: 'tel:+380XXXXXXXXX',
     bg: 'bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100',
   },
 ];
@@ -107,7 +107,7 @@ const FloatingContact: React.FC = () => {
             className="fixed bottom-8 right-24 z-50 pointer-events-none"
           >
             <div className="glass rounded-full px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-white/60 shadow-md whitespace-nowrap">
-              Задати питання
+              💬 Задати питання
             </div>
           </motion.div>
         )}
@@ -150,8 +150,8 @@ const FloatingContact: React.FC = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex flex-col items-center gap-3 py-4 text-center"
                   >
-                    <div className="grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-emerald-600">
-                      <Check className="h-7 w-7" />
+                    <div className="grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-3xl">
+                      ✅
                     </div>
                     <p className="text-base font-bold text-slate-900">Дякуємо!</p>
                     <p className="text-sm leading-relaxed text-slate-600">
@@ -162,19 +162,16 @@ const FloatingContact: React.FC = () => {
                   <>
                     {/* Quick contact links */}
                     <div className="mb-4 grid grid-cols-3 gap-2">
-                      {contacts.map((c) => {
-                        const ContactIcon = c.icon;
-                        return (
-                          <a
-                            key={c.label}
-                            href={c.href}
-                            className={`flex flex-col items-center justify-center gap-2 rounded-2xl px-2 py-3 text-center ring-1 transition ${c.bg}`}
-                          >
-                            <ContactIcon className="h-5 w-5" />
-                            <span className="text-[11px] font-semibold">{c.label}</span>
-                          </a>
-                        );
-                      })}
+                      {contacts.map((c) => (
+                        <a
+                          key={c.label}
+                          href={c.href}
+                          className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-3 text-center ring-1 transition ${c.bg}`}
+                        >
+                          <span className="text-xl">{c.emoji}</span>
+                          <span className="text-[11px] font-semibold">{c.label}</span>
+                        </a>
+                      ))}
                     </div>
 
                     {/* Divider */}

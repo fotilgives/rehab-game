@@ -66,7 +66,7 @@ const HomeSections: React.FC<Props> = ({ account, onExchange }) => {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center text-center"
       >
-        <span className="eyebrow">Усе в одному місці</span>
+        <span className="eyebrow">📂 Усе в одному місці</span>
         <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
           Послуги, бонуси та філософія
         </h2>

@@ -71,7 +71,7 @@ const Philosophy: React.FC<Props> = ({ embedded = false }) => {
   return (
     <Wrapper className={embedded ? '' : 'mx-auto max-w-4xl px-5 pb-20 pt-12 sm:pt-16'}>
       <div className="text-center">
-        {!embedded && <span className="eyebrow">Філософія</span>}
+        {!embedded && <span className="eyebrow">🧠 Філософія</span>}
         <h1 className={`text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl ${embedded ? '' : 'mt-4'}`}>
           Камінь · Ножиці · <span className="text-gradient">Папір</span>
         </h1>
@@ -165,7 +165,7 @@ const Philosophy: React.FC<Props> = ({ embedded = false }) => {
       <Section delay={0.1}>
         <p className="mx-auto mt-10 max-w-2xl text-center text-lg font-medium leading-relaxed text-slate-700">
           Саме цей баланс - твердості, гнучкості й точності - лежить в основі здорового руху, тілесної роботи та внутрішньої
-          рівноваги. 🌿
+          рівноваги.
         </p>
       </Section>
     </Wrapper>

@@ -13,6 +13,7 @@ import Services from './components/pages/Services';
 import Prizes from './components/pages/Prizes';
 import Philosophy from './components/pages/Philosophy';
 import FloatingContact from './components/FloatingContact';
+import RehabDetails from './components/RehabDetails';
 import { useAccount } from './hooks/useAccount';
 import { useRoute, navigate } from './hooks/useRoute';
 
@@ -47,6 +48,7 @@ const App: React.FC = () => {
         <main>
           <Hero onPlay={() => navigate('game')} onExchange={openExchange} />
           <HowItWorks />
+          <RehabDetails />
           <HomeSections account={account} onExchange={openExchange} />
         </main>
       )}
