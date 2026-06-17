@@ -36,7 +36,7 @@ const moves = [
       ['Масаж', 'мʼякі фасціальні та розслаблюючі техніки'],
       ['Бойові мистецтва', 'використання енергії суперника замість прямого протистояння'],
     ],
-    note: 'Мʼякість не означає слабкість — гнучкість часто перемагає там, де сила не працює.',
+    note: 'Мʼякість не означає слабкість - гнучкість часто перемагає там, де сила не працює.',
   },
 ];
 
@@ -47,7 +47,7 @@ const bluffBlocks = [
   },
   {
     title: 'Блеф у йозі',
-    text: 'Тут блеф — це робота розуму та его: образ сили, прихована втома, маскування напруги. Практика вчить помічати ці внутрішні «маски» й бачити справжній стан. Це тренування усвідомленості: чи зберігаю спокій, чи помічаю емоції суперника, чи контролюю реакції.',
+    text: 'Тут блеф - це робота розуму та его: образ сили, прихована втома, маскування напруги. Практика вчить помічати ці внутрішні «маски» й бачити справжній стан. Це тренування усвідомленості: чи зберігаю спокій, чи помічаю емоції суперника, чи контролюю реакції.',
   },
   {
     title: 'Блеф у роботі з тілом',
@@ -61,12 +61,18 @@ const Section: React.FC<{ children: React.ReactNode; delay?: number }> = ({ chil
   </motion.div>
 );
 
-const Philosophy: React.FC = () => {
+interface Props {
+  /** true - компонент рендериться всередині акордеону на головній. */
+  embedded?: boolean;
+}
+
+const Philosophy: React.FC<Props> = ({ embedded = false }) => {
+  const Wrapper: any = embedded ? 'div' : 'main';
   return (
-    <main className="mx-auto max-w-4xl px-5 pb-20 pt-12 sm:pt-16">
+    <Wrapper className={embedded ? '' : 'mx-auto max-w-4xl px-5 pb-20 pt-12 sm:pt-16'}>
       <div className="text-center">
-        <span className="eyebrow">🧠 Філософія</span>
-        <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+        {!embedded && <span className="eyebrow">Філософія</span>}
+        <h1 className={`text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl ${embedded ? '' : 'mt-4'}`}>
           Камінь · Ножиці · <span className="text-gradient">Папір</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-slate-600">
@@ -105,8 +111,8 @@ const Philosophy: React.FC = () => {
         <div className="card-glow mt-10 rounded-3xl p-7 ring-1 ring-white/60">
           <h2 className="text-xl font-extrabold text-slate-900">Баланс трьох принципів</h2>
           <p className="mt-3 leading-relaxed text-slate-600">
-            Немає абсолютної сили чи абсолютної переваги. Стійкість без гнучкості стає жорсткістю; гнучкість без структури —
-            нестабільністю; швидкість без контролю — хаосом.
+            Немає абсолютної сили чи абсолютної переваги. Стійкість без гнучкості стає жорсткістю; гнучкість без структури -
+            нестабільністю; швидкість без контролю - хаосом.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {['Бути твердим, коли потрібно', 'Гнучким, коли ситуація змінюється', 'Точним у потрібний момент'].map((t) => (
@@ -124,7 +130,7 @@ const Philosophy: React.FC = () => {
             Мистецтво контролю та усвідомлення
           </h2>
           <p className="mx-auto mt-3 max-w-2xl leading-relaxed text-slate-600">
-            Блеф — це не просто хитрість, а здатність керувати увагою, емоціями та намірами. Важливо не лише те, що людина
+            Блеф - це не просто хитрість, а здатність керувати увагою, емоціями та намірами. Важливо не лише те, що людина
             робить зовні, а й який внутрішній стан вона передає.
           </p>
         </div>
@@ -158,11 +164,11 @@ const Philosophy: React.FC = () => {
 
       <Section delay={0.1}>
         <p className="mx-auto mt-10 max-w-2xl text-center text-lg font-medium leading-relaxed text-slate-700">
-          Саме цей баланс — твердості, гнучкості й точності — лежить в основі здорового руху, тілесної роботи та внутрішньої
+          Саме цей баланс - твердості, гнучкості й точності - лежить в основі здорового руху, тілесної роботи та внутрішньої
           рівноваги. 🌿
         </p>
       </Section>
-    </main>
+    </Wrapper>
   );
 };
 

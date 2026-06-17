@@ -53,8 +53,8 @@ const PoolGame: React.FC<Props> = ({ account, onTopUp }) => {
     setForcing(false);
   };
 
-  // Блеф доступний, лише якщо останній результат — виграш, і пропущено < 2 раундів.
-  // Блеф завжди доступний — щоб бачити тип мислення гравця.
+  // Блеф доступний, лише якщо останній результат - виграш, і пропущено < 2 раундів.
+  // Блеф завжди доступний - щоб бачити тип мислення гравця.
   const canBluff = true;
 
   useEffect(() => {
@@ -153,8 +153,8 @@ const PoolGame: React.FC<Props> = ({ account, onTopUp }) => {
     if (filledRef.current === round.id) return;
     filledRef.current = round.id;
 
-    const finalTarget = 14 + Math.floor(Math.random() * 7); // 14–20
-    let current = 2 + Math.floor(Math.random() * 3); // старт 2–4
+    const finalTarget = 14 + Math.floor(Math.random() * 7); // 14-20
+    let current = 2 + Math.floor(Math.random() * 3); // старт 2-4
     let cancelled = false;
     let timer = 0;
 
@@ -202,7 +202,7 @@ const PoolGame: React.FC<Props> = ({ account, onTopUp }) => {
       if (msg.includes('insufficient')) onTopUp();
       else if (msg.includes('bluff locked')) setErr('Блеф відкриється після першої перемоги 🔒');
       else if (msg.includes('round closed')) {
-        setErr('Раунд щойно завершився — зачекай наступний 🙂');
+        setErr('Раунд щойно завершився - зачекай наступний 🙂');
         loadCurrent();
       } else if (msg.includes('already bet')) setErr('Ти вже зробив ставку в цьому раунді');
       else setErr('Не вдалося поставити. Спробуй ще раз.');
@@ -278,7 +278,7 @@ const PoolGame: React.FC<Props> = ({ account, onTopUp }) => {
           </div>
           <p className="mb-5 text-[11px] text-slate-400">
             {account.isAccount
-              ? '✓ Ти в акаунті — баланс зберігається на будь-якому пристрої.'
+              ? '✓ Ти в акаунті - баланс зберігається на будь-якому пристрої.'
               : 'Граєш як гість (баланс лише в цьому браузері). Увійди, щоб зберігати скрізь.'}
           </p>
 
@@ -576,7 +576,7 @@ const PoolGame: React.FC<Props> = ({ account, onTopUp }) => {
                   <div className="flex items-center gap-2 rounded-2xl bg-white/70 px-4 py-3 ring-1 ring-slate-200">
                     <Coins className="h-5 w-5 text-amber-500" />
                     <span className="text-lg font-extrabold text-slate-900">{STAKE}</span>
-                    <span className="text-sm text-slate-500">монет — фіксована для всіх</span>
+                    <span className="text-sm text-slate-500">монет - фіксована для всіх</span>
                   </div>
 
                   <motion.button
@@ -624,7 +624,7 @@ const PoolGame: React.FC<Props> = ({ account, onTopUp }) => {
 
           <p className="mt-5 text-center text-xs text-slate-400">
             Реальний онлайн: усі гравці грають в одному раунді. Зароблені монети згодом можна буде витратити на послуги
-            або вивести. Поки що — демо на віртуальних монетах.
+            або вивести. Поки що - демо на віртуальних монетах.
           </p>
         </div>
       </motion.div>

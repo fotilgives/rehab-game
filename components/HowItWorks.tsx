@@ -11,12 +11,12 @@ const steps = [
   {
     icon: Gamepad2,
     title: '2. Зроби ставку в раунді',
-    text: 'У кожному раунді — одна ставка: камінь, ножиці чи папір. Усі ставки гравців складаються у спільний банк.',
+    text: 'У кожному раунді - одна ставка: камінь, ножиці чи папір. Усі ставки гравців складаються у спільний банк.',
   },
   {
     icon: Heart,
     title: '3. Забери виграш',
-    text: 'Камінь б’є ножиці, ножиці — папір, папір — камінь. Переможці ділять банк битих. Монети потім можна витратити на послуги або підтримати реабілітолога.',
+    text: 'Камінь б’є ножиці, ножиці - папір, папір - камінь. Переможці ділять банк битих. Монети потім можна витратити на послуги або підтримати реабілітолога.',
   },
 ];
 
@@ -26,11 +26,11 @@ const HowItWorks: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center text-center"
       >
-        <span className="eyebrow">✨ Як це працює</span>
+        <span className="eyebrow">Як це працює</span>
         <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
           Три кроки до гри
         </h2>

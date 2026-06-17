@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, HeartPulse, Plus, Menu, X } from 'lucide-react';
+import { Coins, Plus, Menu, X } from 'lucide-react';
 import AnimatedNumber from './AnimatedNumber';
+import BrandMark from './BrandMark';
 import type { Route } from '../hooks/useRoute';
 
 interface Props {
@@ -37,15 +38,12 @@ const Navbar: React.FC<Props> = ({ balance, route, onExchange }) => {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
         <a href="#/" onClick={() => setOpen(false)} className="flex items-center gap-2.5">
-          <motion.span
-            whileHover={{ rotate: -10, scale: 1.08 }}
-            className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-200"
-          >
-            <HeartPulse className="h-5 w-5" />
+          <motion.span whileHover={{ rotate: -6, scale: 1.06 }}>
+            <BrandMark size={38} />
           </motion.span>
           <span className="leading-tight">
-            <span className="block text-lg font-extrabold tracking-tight">RehabPlay</span>
-            <span className="hidden text-[11px] font-medium text-slate-400 sm:block">грай · підтримуй · одужуй</span>
+            <span className="block text-base font-extrabold tracking-tight sm:text-lg">Центр розвитку та здоров'я</span>
+            <span className="hidden text-[11px] font-medium text-slate-400 sm:block">рух · баланс · відновлення</span>
           </span>
         </a>
 

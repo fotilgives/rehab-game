@@ -115,18 +115,149 @@ body {
   border-radius: 10px;
 }
 
-/* Mobile tap targets */
-@media (max-width: 640px) {
-  button, a {
-    -webkit-tap-highlight-color: transparent;
-  }
-  input, select, textarea {
-    font-size: 16px; /* prevent iOS zoom */
+/* ─── Hero Section ────────────────────────────────────────────────────────── */
+.hero-section {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+}
+
+/* Background layers */
+.hero-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  background: linear-gradient(135deg, #f0fdf4 0%, rgba(240,253,250,0.6) 40%, rgba(240,249,255,0.5) 100%);
+}
+.hero-bg-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -9;
+  background-image: radial-gradient(rgba(16, 185, 129, 0.09) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse at 40% 50%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse at 40% 50%, #000 30%, transparent 75%);
+}
+.hero-glow-left {
+  position: absolute;
+  inset: 0;
+  left: 5%;
+  top: 20%;
+  z-index: -8;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+.hero-glow-right {
+  position: absolute;
+  right: 5%;
+  bottom: 15%;
+  z-index: -8;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(20,184,166,0.14) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* Grid layout: stacked on mobile, 2-col on large screens */
+.hero-grid {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 4rem;
   }
 }
 
-/* Prevent overflow on small screens */
-img {
-  max-width: 100%;
-  height: auto;
+/* Photo column */
+.hero-photo-col {
+  position: relative;
+  margin: 0 auto;
+  max-width: 22rem;
+  width: 100%;
 }
+@media (min-width: 1024px) {
+  .hero-photo-col {
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* Glow ring behind photo */
+.hero-photo-glow {
+  position: absolute;
+  inset: -1.5rem;
+  border-radius: 2.5rem;
+  background: linear-gradient(135deg, rgba(52,211,153,0.35) 0%, rgba(20,184,166,0.25) 50%, rgba(56,189,248,0.18) 100%);
+  filter: blur(28px);
+  z-index: 0;
+}
+
+/* Photo card wrapper */
+.hero-photo-card {
+  position: relative;
+  z-index: 1;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  box-shadow: 0 25px 60px -15px rgba(5, 150, 105, 0.22), 0 0 0 1px rgba(255,255,255,0.7);
+}
+
+/* Name badge overlaid at photo bottom */
+.hero-photo-badge {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+}
+
+/* Floating "15+ років" pill top-right of photo */
+.hero-stat-pill {
+  display: none;
+  position: absolute;
+  top: -1rem;
+  right: -1.25rem;
+  z-index: 20;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-radius: 1rem;
+  padding: 0.6rem 0.85rem;
+  box-shadow: 0 8px 24px rgba(5,150,105,0.15), 0 0 0 1px rgba(255,255,255,0.7);
+  text-align: center;
+}
+@media (min-width: 1024px) {
+  .hero-stat-pill {
+    display: block;
+  }
+}
+
+/* Stat cards in the info column */
+.hero-stat-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.65) inset, 0 14px 36px -16px rgba(5,100,60,0.2);
+  border-radius: 1rem;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.6);
+}
+
+/* Main hero headline */
+.hero-headline {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+

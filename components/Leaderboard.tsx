@@ -84,7 +84,7 @@ const Leaderboard: React.FC<{ account: Account }> = ({ account }) => {
               );
             })}
           </AnimatePresence>
-          {rows.length === 0 && <p className="py-6 text-center text-sm text-slate-400">Поки що порожньо — зіграй перший раунд!</p>}
+          {rows.length === 0 && <p className="py-6 text-center text-sm text-slate-400">Поки що порожньо - зіграй перший раунд!</p>}
         </div>
       </motion.div>
     </section>
