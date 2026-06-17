@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import HowItWorks from './components/HowItWorks';
+import HomeSections from './components/HomeSections';
 import PoolGame from './components/PoolGame';
 import Leaderboard from './components/Leaderboard';
 import Footer from './components/Footer';
@@ -46,6 +47,7 @@ const App: React.FC = () => {
         <main>
           <Hero onPlay={() => navigate('game')} onExchange={openExchange} />
           <HowItWorks />
+          <HomeSections account={account} onExchange={openExchange} />
         </main>
       )}
 
