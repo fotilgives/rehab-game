@@ -57,20 +57,30 @@ const Services: React.FC = () => {
         <p className="mx-auto mt-3 max-w-xl text-slate-600">Оберіть напрямок і запишіться - підберемо зручний час.</p>
       </div>
 
-      {/* Yoga course photo - vertical, clickable */}
+      {/* Банер курсу з йоги */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: "0px 0px -40px 0px" }}
         transition={{ duration: 0.55 }}
-        className="mx-auto mt-8 max-w-xs"
+        className="mt-6 grid items-stretch gap-5 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]"
       >
-        <ZoomImage
-          src="/images/yoga.jpg"
-          alt="Курс з йоги"
-          className="aspect-[3/4] w-full rounded-3xl shadow-xl shadow-emerald-900/10 ring-1 ring-white/60"
-        />
-        <p className="mt-3 text-center text-sm font-medium text-slate-500">Курс з йоги - натисни, щоб відкрити</p>
+        <div className="flex flex-col justify-center rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-600 p-7 text-white shadow-xl shadow-emerald-300/40">
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+            <Flower2 className="h-3.5 w-3.5" /> Йога
+          </span>
+          <h2 className="mt-3 text-2xl font-extrabold">Курс з йоги та тілесних практик</h2>
+          <p className="mt-2 text-sm leading-relaxed text-emerald-50">
+            М'яко, усвідомлено та з турботою про тіло. Підходить як початківцям, так і тим, хто хоче поглибити практику.
+          </p>
+        </div>
+        <div className="relative w-full overflow-hidden rounded-3xl aspect-[3/4] sm:aspect-auto">
+          <ZoomImage
+            src="/images/yoga.jpg"
+            alt="Курс з йоги"
+            className="absolute inset-0 h-full w-full shadow-xl shadow-emerald-900/10 ring-1 ring-white/60"
+          />
+        </div>
       </motion.div>
 
       <div className="mt-9 grid gap-5 sm:grid-cols-2">
@@ -79,7 +89,7 @@ const Services: React.FC = () => {
             key={title}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "0px 0px -40px 0px" }}
             transition={{ duration: 0.5, delay: i * 0.06 }}
             className="glass rounded-3xl p-6 ring-1 ring-white/60"
           >
@@ -104,7 +114,7 @@ const Services: React.FC = () => {
         id="book"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: "0px 0px -40px 0px" }}
         className="card-glow mx-auto mt-10 max-w-xl rounded-3xl p-7 ring-1 ring-white/60"
       >
         <h2 className="flex items-center gap-2 text-xl font-extrabold text-slate-900">

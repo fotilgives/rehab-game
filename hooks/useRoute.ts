@@ -17,7 +17,9 @@ export function useRoute(): Route {
   useEffect(() => {
     const onChange = () => {
       setRoute(parse());
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      }, 0);
     };
     window.addEventListener('hashchange', onChange);
     return () => window.removeEventListener('hashchange', onChange);
