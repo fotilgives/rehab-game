@@ -22,6 +22,21 @@ const App: React.FC = () => {
   const [exchangeOpen, setExchangeOpen] = useState(false);
   const openExchange = () => setExchangeOpen(true);
 
+  React.useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    // Force top scroll on next animation frame in case DOM is still rendering
+    const rafId = requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+    });
+    return () => cancelAnimationFrame(rafId);
+  }, [route]);
+
   return (
     <div className="min-h-screen text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
       <Background />
