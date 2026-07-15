@@ -43,11 +43,12 @@ const App: React.FC = () => {
   const [thanks, setThanks] = useState<null | 'donate' | 'topup' | 'course'>(null);
   const [tournamentJoin, setTournamentJoin] = useState<number | null>(null);
 
-  // Запрошення в турнір ?tournament=<id> — показуємо екран ЗГОДИ (без авто-списання).
+  // Запрошення в турнір ?tournament=<id> — завжди показуємо модалку.
+  // Модалка сама перевіряє через Supabase чи вже зареєстрований.
   useEffect(() => {
     const t = new URLSearchParams(window.location.search).get('tournament');
     const tId = t ? parseInt(t, 10) : NaN;
-    if (tId && !isNaN(tId) && !localStorage.getItem(`rps_tournament_joined_${tId}`)) {
+    if (tId && !isNaN(tId)) {
       setTournamentJoin(tId);
     }
   }, []);
