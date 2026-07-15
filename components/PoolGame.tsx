@@ -156,28 +156,13 @@ const PoolGame: React.FC<Props> = ({ account, onTopUp, onLogin }) => {
 
   const fetchUpcomingTournament = useCallback(async () => {
     if (!account.playerId) return;
-    const { data } = await supabase
-      .from('rps_tournament_invites')
-      .select(`
-        status,
-        rps_tournaments!inner (
-          id,
-          name,
-          status,
-          date
-        )
-      `)
-      .eq('player_id', account.playerId)
-      .eq('status', 'yes')
-      .eq('rps_tournaments.status', 'scheduled')
-      .maybeSingle();
-
-    if (data && data.rps_tournaments) {
-      const t = data.rps_tournaments as any;
+    const { data } = await supabase.rpc('rps_my_registered_tournament', { p_player_id: account.playerId });
+    // We only display the upcoming banner if the tournament status is 'scheduled'
+    if (data && data.status === 'scheduled') {
       setUpcomingTournament({
-        id: t.id,
-        name: t.name,
-        date: t.date,
+        id: data.id,
+        name: data.name,
+        date: data.date,
       });
     } else {
       setUpcomingTournament(null);

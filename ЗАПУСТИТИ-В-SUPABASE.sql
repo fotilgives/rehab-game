@@ -447,6 +447,38 @@ grant execute on function public.rps_my_tournament_status(uuid) to anon, authent
 grant execute on function public.rps_tournament_leaderboard(bigint) to anon, authenticated;
 grant execute on function public.rps_admin_get_tournaments(uuid) to anon, authenticated;
 
+-- ── Моя реєстрація в турнірі (scheduled або active) ─────────────────────────
+-- Залізний фікс: обходить проблеми PostgREST join
+create or replace function public.rps_my_registered_tournament(p_player_id uuid)
+returns jsonb language sql security definer set search_path to 'public' stable as $function$
+  select case when t.id is null then null else jsonb_build_object(
+    'id',        t.id,
+    'name',      t.name,
+    'status',    t.status,
+    'date',      t.date,
+    'end_date',  t.end_date,
+    'prepay_coins', t.prepay_coins
+  ) end
+  from public.rps_tournament_invites i
+  join public.rps_tournaments t on t.id = i.tournament_id
+  where i.player_id = p_player_id
+    and i.status = 'yes'
+    and t.status in ('scheduled', 'active')
+  order by t.date asc
+  limit 1;
+$function$;
+
+grant execute on function public.rps_my_registered_tournament(uuid) to anon, authenticated;
+
+-- ── 9. RLS read policies for tournaments ────────────────────────────
+alter table public.rps_tournaments enable row level security;
+drop policy if exists rps_tournaments_read_anon on public.rps_tournaments;
+create policy rps_tournaments_read_anon on public.rps_tournaments for select to anon, authenticated using (true);
+
+alter table public.rps_tournament_invites enable row level security;
+drop policy if exists rps_tournament_invites_read_anon on public.rps_tournament_invites;
+create policy rps_tournament_invites_read_anon on public.rps_tournament_invites for select to anon, authenticated using (true);
+
 commit;
 
 notify pgrst, 'reload schema';
