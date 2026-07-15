@@ -97,16 +97,22 @@ const Profile: React.FC<Props> = ({ account, onTopUp, onLogin }) => {
     if (!account.playerId) return;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
+      // Отримуємо всі підтверджені запрошення і фільтруємо client-side
+      // (PostgREST не підтримує .in() на вкладених таблицях)
+      const { data: rows, error } = await supabase
         .from('rps_tournament_invites')
-        .select('status, rps_tournaments!inner(id, name, status, date, end_date)')
+        .select('status, rps_tournaments(id, name, status, date, end_date)')
         .eq('player_id', account.playerId)
-        .eq('status', 'yes')
-        .in('rps_tournaments.status', ['scheduled', 'active'])
-        .maybeSingle();
+        .eq('status', 'yes');
       if (cancelled) return;
-      if (data?.rps_tournaments) {
-        const t = data.rps_tournaments as any;
+      if (error) { setTournament(null); return; }
+      // Шукаємо перший активний або запланований турнір
+      const found = (rows ?? []).find((row: any) => {
+        const t = row.rps_tournaments;
+        return t && (t.status === 'scheduled' || t.status === 'active');
+      });
+      if (found?.rps_tournaments) {
+        const t = found.rps_tournaments as any;
         setTournament({ id: t.id, name: t.name, status: t.status, date: t.date, end_date: t.end_date ?? null });
       } else {
         setTournament(null);
