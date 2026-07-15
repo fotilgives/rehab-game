@@ -64,7 +64,7 @@ const purchaseBadge = (kind: string, status: string) => {
 interface TournamentReminder {
   id: number;
   name: string;
-  status: 'scheduled' | 'active';
+  status: 'scheduled' | 'active' | 'finished';
   date: string;
   end_date: string | null;
 }
@@ -92,31 +92,21 @@ const Profile: React.FC<Props> = ({ account, onTopUp, onLogin }) => {
     return () => { cancelled = true; };
   }, [account.playerId, account.balance]);
 
-  // Завантажуємо турнір, на який зареєстрований гравець
+  // Залізний фікс: використовуємо SQL-функцію напряму (без PostgREST join)
   useEffect(() => {
     if (!account.playerId) return;
     let cancelled = false;
     (async () => {
-      // Отримуємо всі підтверджені запрошення і фільтруємо client-side
-      // (PostgREST не підтримує .in() на вкладених таблицях)
-      const { data: rows, error } = await supabase
-        .from('rps_tournament_invites')
-        .select('status, rps_tournaments(id, name, status, date, end_date)')
-        .eq('player_id', account.playerId)
-        .eq('status', 'yes');
+      const { data, error } = await supabase.rpc('rps_my_registered_tournament', { p_player_id: account.playerId });
       if (cancelled) return;
-      if (error) { setTournament(null); return; }
-      // Шукаємо перший активний або запланований турнір
-      const found = (rows ?? []).find((row: any) => {
-        const t = row.rps_tournaments;
-        return t && (t.status === 'scheduled' || t.status === 'active');
+      if (error || !data) { setTournament(null); return; }
+      setTournament({
+        id: data.id,
+        name: data.name,
+        status: data.status,
+        date: data.date,
+        end_date: data.end_date ?? null,
       });
-      if (found?.rps_tournaments) {
-        const t = found.rps_tournaments as any;
-        setTournament({ id: t.id, name: t.name, status: t.status, date: t.date, end_date: t.end_date ?? null });
-      } else {
-        setTournament(null);
-      }
     })();
     return () => { cancelled = true; };
   }, [account.playerId]);
@@ -287,12 +277,16 @@ const Profile: React.FC<Props> = ({ account, onTopUp, onLogin }) => {
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="relative mt-4 overflow-hidden rounded-3xl shadow-xl"
           >
-            {/* Gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700" />
+            {/* Gradient background based on status */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${
+              tournament.status === 'finished'
+                ? 'from-slate-700 via-slate-800 to-slate-900'
+                : 'from-violet-600 via-purple-600 to-indigo-700'
+            }`} />
             {/* Decorative blobs */}
             <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-8 -left-8 h-28 w-28 rounded-full bg-violet-300/25 blur-2xl" />
-            <div className="pointer-events-none absolute right-1/3 top-0 h-20 w-20 rounded-full bg-fuchsia-400/20 blur-xl" />
+            <div className="pointer-events-none absolute -bottom-8 -left-8 h-28 w-28 rounded-full bg-violet-300/20 blur-2xl" />
+            <div className="pointer-events-none absolute right-1/3 top-0 h-20 w-20 rounded-full bg-white/5 blur-xl" />
 
             <div className="relative p-5 sm:p-6">
               {/* Header row */}
@@ -303,8 +297,12 @@ const Profile: React.FC<Props> = ({ account, onTopUp, onLogin }) => {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     {tournament.status === 'active' ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-950">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-950 animate-pulse">
                         <Zap className="h-2.5 w-2.5" /> Турнір ЙДЕ
+                      </span>
+                    ) : tournament.status === 'finished' ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-500 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-100">
+                        ✓ Завершився
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/90 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-950">
@@ -319,34 +317,68 @@ const Profile: React.FC<Props> = ({ account, onTopUp, onLogin }) => {
               </div>
 
               {/* Info row */}
-              <div className="mt-4 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm">
+              <div className="mt-4 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm text-white">
                 {tournament.status === 'active' ? (
-                  <p className="text-sm font-semibold text-violet-100">
-                    🎮 Турнір вже активний! Переходь до гри та борись за перемогу.
-                  </p>
-                ) : (
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-wide text-violet-300">Початок</div>
-                      <div className="mt-0.5 text-sm font-bold text-white">
-                        {new Date(tournament.date).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' })}
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-violet-100">
+                      🎮 Турнір вже активний! Переходь до гри та борись за перемогу.
+                    </p>
+                    {tournament.end_date && (
+                      <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2 text-xs">
+                        <span className="font-semibold text-violet-300">Триває до:</span>
+                        <span className="font-bold text-white">
+                          {new Date(tournament.end_date).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' })}
+                        </span>
                       </div>
+                    )}
+                  </div>
+                ) : tournament.status === 'finished' ? (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-slate-300 leading-relaxed">
+                      Турнір успішно завершився. Дякуємо за участь! Результати та виграші оновлено в загальній таблиці.
+                    </p>
+                    <div className="flex items-center justify-between border-t border-white/10 pt-2 text-xs">
+                      <span className="font-semibold text-slate-400">Час закінчення:</span>
+                      <span className="font-bold text-slate-200">
+                        {tournament.end_date
+                          ? new Date(tournament.end_date).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' })
+                          : 'Не вказано'}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      <div>
+                        <span className="block text-[10px] font-semibold uppercase tracking-wider text-violet-300">Початок</span>
+                        <span className="font-bold">
+                          {new Date(tournament.date).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' })}
+                        </span>
+                      </div>
+                      {tournament.end_date && (
+                        <div className="text-right">
+                          <span className="block text-[10px] font-semibold uppercase tracking-wider text-violet-300">Закінчення</span>
+                          <span className="font-bold">
+                            {new Date(tournament.end_date).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' })}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     {countdown && (
-                      <div className="text-right">
-                        <div className="text-[11px] font-semibold uppercase tracking-wide text-violet-300">До початку</div>
-                        <div className="mt-0.5 font-mono text-sm font-extrabold text-amber-300">{countdown}</div>
+                      <div className="flex items-center justify-between border-t border-white/10 pt-2 text-xs">
+                        <span className="font-semibold text-violet-300">Час до старту:</span>
+                        <span className="font-mono font-bold text-amber-300">{countdown}</span>
                       </div>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* Action button */}
+              {/* Action buttons */}
               {tournament.status === 'active' && (
                 <button
                   onClick={() => navigate('home')}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-sm font-extrabold text-violet-700 shadow-lg transition hover:bg-violet-50 active:scale-95"
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-sm font-extrabold text-violet-750 shadow-lg transition hover:bg-violet-50 active:scale-95"
                 >
                   <Zap className="h-4 w-4" /> Грати зараз!
                 </button>
