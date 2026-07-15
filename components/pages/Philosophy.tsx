@@ -71,7 +71,7 @@ const Philosophy: React.FC<Props> = ({ embedded = false }) => {
   return (
     <Wrapper className={embedded ? '' : 'mx-auto max-w-4xl px-5 pb-20 pt-12 sm:pt-16'}>
       <div className="text-center">
-        {!embedded && <span className="eyebrow">🧠 Філософія</span>}
+        {!embedded && <span className="eyebrow">Філософія</span>}
         <h1 className={`text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl ${embedded ? '' : 'mt-4'}`}>
           Камінь · Ножиці · <span className="text-gradient">Папір</span>
         </h1>
@@ -125,7 +125,7 @@ const Philosophy: React.FC<Props> = ({ embedded = false }) => {
       {/* Bluff */}
       <Section delay={0.05}>
         <div className="mt-12 text-center">
-          <span className="eyebrow">🤫 Блеф</span>
+          <span className="eyebrow">Блеф</span>
           <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             Мистецтво контролю та усвідомлення
           </h2>

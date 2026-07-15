@@ -12,19 +12,19 @@ const contacts = [
   {
     label: 'Telegram',
     emoji: '✈️',
-    href: 'https://t.me/your_handle',
+    href: 'https://t.me/+380638069916',
     bg: 'bg-sky-50 text-sky-700 ring-sky-200 hover:bg-sky-100',
   },
   {
     label: 'Viber',
     emoji: '📱',
-    href: 'viber://chat?number=%2B380XXXXXXXXX',
+    href: 'viber://chat?number=%2B380638069916',
     bg: 'bg-violet-50 text-violet-700 ring-violet-200 hover:bg-violet-100',
   },
   {
     label: 'Телефон',
     emoji: '📞',
-    href: 'tel:+380XXXXXXXXX',
+    href: 'tel:+380638069916',
     bg: 'bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100',
   },
 ];
@@ -59,8 +59,10 @@ const FloatingContact: React.FC = () => {
         onClick={() => setOpen((o) => !o)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.93 }}
+        animate={open ? { y: 0 } : { y: [0, -6, 0] }}
+        transition={open ? { duration: 0.2 } : { duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
         aria-label={open ? 'Закрити' : 'Задати питання'}
-        className="fixed bottom-6 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-2xl shadow-emerald-400/40 ring-4 ring-emerald-100 transition hover:bg-emerald-700"
+        className="fixed bottom-6 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full overflow-hidden shadow-2xl shadow-emerald-950/20 ring-4 ring-white"
       >
         <AnimatePresence mode="wait">
           {open ? (
@@ -70,48 +72,24 @@ const FloatingContact: React.FC = () => {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.2 }}
+              className="flex h-full w-full items-center justify-center bg-slate-900 text-white"
             >
               <X className="h-6 w-6" />
             </motion.span>
           ) : (
             <motion.span
-              key="msg"
+              key="chat"
               initial={{ rotate: 90, opacity: 0 }}
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: -90, opacity: 0 }}
               transition={{ duration: 0.2 }}
+              className="flex h-full w-full items-center justify-center bg-emerald-600 text-white"
             >
               <MessageCircle className="h-6 w-6" />
             </motion.span>
           )}
         </AnimatePresence>
-
-        {/* Pulse ring when closed */}
-        {!open && (
-          <motion.span
-            className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-emerald-400"
-            animate={{ scale: [1, 1.45, 1], opacity: [0.75, 0, 0.75] }}
-            transition={{ duration: 2.5, repeat: Infinity }}
-          />
-        )}
       </motion.button>
-
-      {/* Label bubble */}
-      <AnimatePresence>
-        {!open && (
-          <motion.div
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 10 }}
-            transition={{ delay: 1.5, duration: 0.4 }}
-            className="fixed bottom-8 right-24 z-50 pointer-events-none"
-          >
-            <div className="glass rounded-full px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-white/60 shadow-md whitespace-nowrap">
-              💬 Задати питання
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── Popup card ──────────────────────────────────────────── */}
       <AnimatePresence>

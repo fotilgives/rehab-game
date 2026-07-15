@@ -1,7 +1,24 @@
-node_modules
-dist
-.vercel
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local tooling / scratch
+scratch/
+scratchpad/
+deer-flow/
+*.original.md
+transcript-*.md
+migrate_*.py
+migrate_*.mjs
+
+# Env / secrets
 .env
-.env.local
-*.log
+.env.*
+!.env.example
+
+# OS / editor
 .DS_Store
+*.log
+.vercel/

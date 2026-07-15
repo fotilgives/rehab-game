@@ -4,15 +4,17 @@ import { ChevronDown, HandHeart, Gift, Brain, Gamepad2 } from 'lucide-react';
 import Services from './pages/Services';
 import Prizes from './pages/Prizes';
 import Philosophy from './pages/Philosophy';
+import Team from './Team';
 import { navigate } from '../hooks/useRoute';
 import type { Account } from '../hooks/useAccount';
 
 interface Props {
   account: Account;
   onExchange: () => void;
+  onLogin?: () => void;
 }
 
-const HomeSections: React.FC<Props> = ({ account, onExchange }) => {
+const HomeSections: React.FC<Props> = ({ account, onExchange, onLogin }) => {
   // За замовчуванням відкрита перша секція — Послуги.
   const [open, setOpen] = useState<string | null>('services');
 
@@ -20,7 +22,7 @@ const HomeSections: React.FC<Props> = ({ account, onExchange }) => {
     {
       id: 'services',
       icon: HandHeart,
-      title: 'Послуги та запис',
+      title: 'Послуги та напрямки',
       subtitle: 'Масаж, реабілітація, йога, навчання',
       content: <Services embedded />,
     },
@@ -29,7 +31,7 @@ const HomeSections: React.FC<Props> = ({ account, onExchange }) => {
       icon: Gift,
       title: 'Призи за монети',
       subtitle: 'Обмін ігрових монет на послуги та знижки',
-      content: <Prizes account={account} onTopUp={onExchange} embedded />,
+      content: <Prizes account={account} onTopUp={onExchange} onLogin={onLogin} embedded />,
     },
     {
       id: 'philosophy',
@@ -66,11 +68,28 @@ const HomeSections: React.FC<Props> = ({ account, onExchange }) => {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center text-center"
       >
-        <span className="eyebrow">📂 Усе в одному місці</span>
+        <span className="eyebrow">Наша команда</span>
         <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
-          Послуги, бонуси та філософія
+          Наша команда
         </h2>
         <p className="mt-2 max-w-xl text-sm text-slate-500">
+          Команда досвідчених спеціалістів центру — кожен напрямок веде окремий фахівець.
+        </p>
+      </motion.div>
+
+      {/* Команда */}
+      <Team />
+
+      {/* Усе в одному місці — послуги, призи, філософія */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.5 }}
+        className="mt-16 flex flex-col items-center text-center"
+      >
+        <span className="eyebrow">Усе в одному місці</span>
+        <p className="mt-3 max-w-xl text-sm text-slate-500">
           Оберіть потрібну послугу, дізнайтеся про бонусну програму або почитайте про мій підхід до
           відновлення та балансу.
         </p>

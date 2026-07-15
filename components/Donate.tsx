@@ -42,7 +42,7 @@ const Donate: React.FC<Props> = ({ account, onTopUp }) => {
         >
           <Heart className="h-6 w-6" />
         </motion.span>
-        <span className="eyebrow mt-4">❤️ Підтримка</span>
+        <span className="eyebrow mt-4">Підтримка</span>
         <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900">Підтримати реабілітолога</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
           Монетами зі свого балансу можна підтримати роботу спеціаліста. Це демо: згодом донати

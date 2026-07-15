@@ -24,11 +24,11 @@ function getGuestId(): string {
 }
 
 function initialId(): string {
-  return localStorage.getItem(ACCOUNT_KEY) || getGuestId();
+  return sessionStorage.getItem(ACCOUNT_KEY) || localStorage.getItem(ACCOUNT_KEY) || getGuestId();
 }
 
 function initialNick(): string {
-  return localStorage.getItem(NICK_KEY) || 'Гравець-' + Math.floor(1000 + Math.random() * 9000);
+  return sessionStorage.getItem(NICK_KEY) || localStorage.getItem(NICK_KEY) || 'Гравець-' + Math.floor(1000 + Math.random() * 9000);
 }
 
 export interface Account {
@@ -44,15 +44,16 @@ export interface Account {
   refresh: () => Promise<void>;
   topUp: (amount: number) => Promise<void>;
   donate: (amount: number) => Promise<boolean>;
-  login: (loginStr: string, password: string) => Promise<string | null>;
-  signup: (loginStr: string, password: string, nick: string) => Promise<string | null>;
+  login: (loginStr: string, password: string, remember?: boolean) => Promise<string | null>;
+  signup: (loginStr: string, password: string, nick: string, remember?: boolean, refCode?: string) => Promise<string | null>;
   logout: () => void;
   redeem: (reward: string, cost: number) => Promise<string | null>;
+  addReview: (rating: number, text: string) => Promise<string | null>;
 }
 
 export function useAccount(): Account {
   const [playerId, setPlayerId] = useState(initialId);
-  const [isAccount, setIsAccount] = useState(() => !!localStorage.getItem(ACCOUNT_KEY));
+  const [isAccount, setIsAccount] = useState(() => !!(sessionStorage.getItem(ACCOUNT_KEY) || localStorage.getItem(ACCOUNT_KEY)));
   const [nickname, setNicknameState] = useState(initialNick);
   const [balance, setBalance] = useState(0);
   const [wins, setWins] = useState(0);
@@ -85,9 +86,45 @@ export function useAccount(): Account {
     let active = true;
     (async () => {
       await supabase.rpc('rps_register', { p_id: playerId, p_nick: nickRef.current });
+      // Реферал: якщо зайшли за посиланням ?ref=<inviterId> — зараховуємо запрошення
+      // (скидає таймер «таяння» тому, хто запросив). Спрацьовує один раз.
+      try {
+        const ref = new URLSearchParams(window.location.search).get('ref');
+        if (ref && ref !== playerId && !localStorage.getItem('rps_ref_done')) {
+          await supabase.rpc('rps_accept_referral', { p_invitee: playerId, p_inviter: ref });
+          localStorage.setItem('rps_ref_done', '1');
+        }
+      } catch {
+        /* ignore */
+      }
+      // Приєднання до турніру за посиланням ?tournament= більше НЕ автоматичне.
+      // Його показує окремий екран згоди (TournamentJoinModal) — зі згодою,
+      // попередженням про резерв завдатку і пропозицією поповнити при нестачі.
       if (active) {
         await refresh();
         setReady(true);
+      }
+      // Страхувальна звірка платежів: перевіряємо статус збережених замовлень
+      // у WayForPay і дораховуємо монети, якщо колбек/повернення не спрацювали.
+      try {
+        const key = 'wfp_pending_refs';
+        const refs: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+        if (refs.length > 0) {
+          const r = await fetch('/api/wayforpay-reconcile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerId, refs }),
+          });
+          const data = await r.json().catch(() => ({}));
+          // Прибираємо вже зараховані замовлення з локального списку.
+          if (Array.isArray(data?.done) && data.done.length > 0) {
+            const left = refs.filter((x) => !data.done.includes(x));
+            localStorage.setItem(key, JSON.stringify(left));
+          }
+          if (active && data && data.credited > 0) await refresh();
+        }
+      } catch {
+        /* ignore */
       }
     })();
 
@@ -138,45 +175,65 @@ export function useAccount(): Account {
     [playerId, refresh]
   );
 
-  const applyAccount = (id: string, nick: string) => {
-    localStorage.setItem(ACCOUNT_KEY, id);
-    localStorage.setItem(NICK_KEY, nick);
+  const applyAccount = (id: string, nick: string, remember = true) => {
+    if (remember) {
+      localStorage.setItem(ACCOUNT_KEY, id);
+      localStorage.setItem(NICK_KEY, nick);
+      sessionStorage.removeItem(ACCOUNT_KEY);
+    } else {
+      sessionStorage.setItem(ACCOUNT_KEY, id);
+      sessionStorage.setItem(NICK_KEY, nick);
+      localStorage.removeItem(ACCOUNT_KEY);
+    }
     setNicknameState(nick);
     setIsAccount(true);
     setPlayerId(id); // re-runs the effect -> register + subscribe + refresh
   };
 
-  const login = useCallback(async (loginStr: string, password: string): Promise<string | null> => {
+  const login = useCallback(async (loginStr: string, password: string, remember = true): Promise<string | null> => {
     const { data, error } = await supabase.rpc('rps_login', { p_login: loginStr, p_password: password });
     if (error || !data) return 'Невірний логін або пароль';
     const d = data as { id: string; nickname: string };
-    applyAccount(d.id, d.nickname);
+    applyAccount(d.id, d.nickname, remember);
     return null;
   }, []);
 
-  const signup = useCallback(async (loginStr: string, password: string, nick: string): Promise<string | null> => {
-    const { data, error } = await supabase.rpc('rps_signup', { p_login: loginStr, p_password: password, p_nick: nick });
+  const signup = useCallback(async (loginStr: string, password: string, nick: string, remember = true, refCode?: string): Promise<string | null> => {
+    // Код запрошення: приймаємо як чистий uuid, так і повний лінк ?ref=<uuid>.
+    const refRaw = (refCode || '').trim();
+    const refMatch = refRaw.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+    const p_ref = refMatch ? refMatch[0] : null;
+    const { data, error } = await supabase.rpc('rps_signup', { p_login: loginStr, p_password: password, p_nick: nick, p_ref });
     if (error) {
       const m = error.message || '';
-      if (m.includes('login taken')) return 'Такий логін уже зайнятий';
-      if (m.includes('login short')) return 'Логін — мінімум 3 символи';
+      if (m.includes('login taken')) return 'Ця пошта вже зареєстрована';
+      if (m.includes('bad email')) return 'Вкажіть коректну пошту (email)';
       if (m.includes('password short')) return 'Пароль — мінімум 4 символи';
       return 'Не вдалося створити акаунт';
     }
     const d = data as { id: string; nickname: string };
-    applyAccount(d.id, d.nickname);
+    applyAccount(d.id, d.nickname, remember);
+    // Привітальний лист — fire-and-forget, не блокує реєстрацію.
+    fetch('/api/send-welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: loginStr.trim(), name: nick }),
+    }).catch(() => {});
     return null;
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem(ACCOUNT_KEY);
+    localStorage.removeItem(NICK_KEY);
+    sessionStorage.removeItem(ACCOUNT_KEY);
+    sessionStorage.removeItem(NICK_KEY);
     setIsAccount(false);
     setPlayerId(getGuestId());
   }, []);
 
   const redeem = useCallback(
     async (reward: string, cost: number): Promise<string | null> => {
-      const { error } = await supabase.rpc('rps_redeem', {
+      const { data, error } = await supabase.rpc('rps_redeem', {
         p_id: playerId,
         p_nick: nickRef.current,
         p_reward: reward,
@@ -186,6 +243,31 @@ export function useAccount(): Account {
       if (error) {
         if ((error.message || '').includes('insufficient')) return 'Недостатньо монет';
         return 'Не вдалося оформити';
+      }
+      const code = (data as { code?: string } | null)?.code;
+      // Лист про оформлення призу клієнту + сповіщення власнику (fire-and-forget).
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'redeem', playerId, reward, cost, nickname: nickRef.current, code }),
+      }).catch(() => {});
+      return null;
+    },
+    [playerId, refresh]
+  );
+
+  const addReview = useCallback(
+    async (rating: number, text: string): Promise<string | null> => {
+      const { error } = await supabase.rpc('rps_add_review', {
+        p_id: playerId,
+        p_nick: nickRef.current,
+        p_rating: rating,
+        p_text: text,
+      });
+      await refresh();
+      if (error) {
+        if ((error.message || '').includes('review short')) return 'Відгук занадто короткий';
+        return 'Не вдалося надіслати відгук';
       }
       return null;
     },
@@ -209,5 +291,6 @@ export function useAccount(): Account {
     signup,
     logout,
     redeem,
+    addReview,
   };
 }

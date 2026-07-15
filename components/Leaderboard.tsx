@@ -44,7 +44,7 @@ const Leaderboard: React.FC<{ account: Account }> = ({ account }) => {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="glass overflow-hidden rounded-[2rem] p-6 shadow-xl shadow-emerald-900/5 ring-1 ring-white/60"
       >
-        <span className="eyebrow">🏆 Рейтинг</span>
+        <span className="eyebrow">Рейтинг</span>
         <h2 className="mt-3 flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900">
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-amber-400 text-white shadow-lg shadow-amber-200">
             <Trophy className="h-5 w-5" />

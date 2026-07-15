@@ -1,83 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CalendarCheck, Check, ArrowRight, X, ShieldAlert, Activity, Heart, Eye } from 'lucide-react';
+import { CalendarCheck, Check, ArrowRight, X, Play, Phone } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import SmartImage from '../SmartImage';
+import PriceList from '../PriceList';
+import MediaShowcase from '../MediaShowcase';
+
+const SPECIALISTS = ['Володимир Мальцев', 'Інший спеціаліст'] as const;
 
 interface ServiceItem {
   title: string;
+  category?: string;
   image: string;
+  /** Коротке відео процесу (необов'язково) — показується у вікні «Докладніше». */
+  video?: string;
+  /** Постер для відео (інакше береться image). */
+  poster?: string;
   short: string;
   details: string;
   cases: string[];
+  /** Заголовок над списком показань/напрямків. */
+  casesTitle?: string;
 }
 
 const SERVICES_DATA: ServiceItem[] = [
   {
-    title: 'Медичні консультації та діагностика',
-    image: '/images/consultation.png',
-    short: 'Оцінка загального стану, вимірювання тиску, складання індивідуального плану реабілітації.',
-    details: 'Наш лікар-реабілітолог проводить комплексний огляд пацієнта, оцінює рівень збережених рухових функцій за міжнародними шкалами, визначає реабілітаційний потенціал та формує індивідуальну програму відновлення.',
+    title: 'Східний (тайський) масаж',
+    image: '/images/consultation.jpg',
+    short: 'Традиційний тайський масаж: розтяжка, акупресура та відновлення енергетичного балансу тіла.',
+    details: 'Тайський масаж поєднує глибокий тиск на біологічно активні точки, пасивну йогу та ритмічні розтяжки. Сеанс покращує кровообіг, знімає м’язові блоки, відновлює гнучкість та заряджає енергією на кілька днів вперед.',
     cases: [
-      'Стани після інсульту та інфаркту міокарда',
-      'Хронічні захворювання опорно-рухового апарату',
-      'Травми суглобів та хребта',
-      'Підготовка до протезування суглобів та кінцівок'
+      'Хронічна втома та зниження тонусу тіла',
+      'М’язові затиски у спині, шиї та плечах',
+      'Порушення постави та обмежена рухливість',
+      'Стрес та емоційне перевантаження'
     ]
   },
   {
-    title: 'Фізична терапія',
-    image: '/images/physical_therapy.png',
-    short: 'Активне відновлення рухових функцій за допомогою підвісних систем, кінезотерапії та ЛФК.',
-    details: 'Використання сучасного обладнання (наприклад, підвісних терапевтичних систем Redcord) дозволяє тренувати м’язи в стані невагомості або з індивідуально підібраним опором, що значно прискорює повернення сили та гнучкості.',
-    cases: [
-      'Слабкість м’язів після тривалого лікування та операцій',
-      'Порушення координації рухів та балансу тіла',
-      'Парези та паралічі різного ступеня важкості',
-      'Біль у спині та суглобах при обмеженій рухливості'
-    ]
-  },
-  {
-    title: 'Ерготерапія',
-    image: '/images/ergotherapy.png',
-    short: 'Відновлення повсякденних та побутових навичок самообслуговування, дрібної моторики рук.',
-    details: 'Ерготерапевт допомагає пацієнту заново навчитися користуватися столовими приборами, одягатися, писати, готувати їжу, адаптуючи життєвий простір та використовуючи спеціальні тренажери для пальців та долоней.',
-    cases: [
-      'Труднощі з письмом чи утриманням предметів',
-      'Необхідність адаптації будинку після травм',
-      'Втрата побутової незалежності',
-      'Когнітивні розлади, що заважають самообслуговуванню'
-    ]
-  },
-  {
-    title: 'Психологічна допомога',
-    image: '/images/psychology.png',
-    short: 'Психологічна підтримка пацієнта та його родичів, подолання депресивних станів після травм.',
-    details: 'Реабілітація — це важкий психологічний процес. Індивідуальні консультації психолога допомагають пацієнту знайти внутрішню мотивацію до відновлення та повернути емоційний баланс.',
-    cases: [
-      'Апатія та депресія після інсульту чи ампутації',
-      'Тривожність та страх перед майбутнім',
-      'Емоційне вигорання членів родини, що доглядають за хворим',
-      'Посттравматичний синдром (ПТСР)'
-    ]
-  },
-  {
-    title: 'Логопедична допомога (корекція)',
-    image: '/images/speech_therapy.png',
-    short: 'Відновлення мовлення (афазія, дизартрія), тренування безпечного ковтання (дисфагія).',
-    details: 'Спеціальні логопедичні масажі та артикуляційні вправи допомагають відновити контроль над мімічними м’язами та мовним апаратом, а також безпечно приймати їжу.',
-    cases: [
-      'Порушення вимови або розуміння мови після інсульту',
-      'Порушення ковтання їжі чи води',
-      'Слабкість артикуляційних м’язів',
-      'Заїкання та інші мовленнєві розлади'
-    ]
-  },
-  {
-    title: 'Лікувальний масаж',
+    title: 'Оздоровчий масаж',
     image: '/images/massage.jpg',
     short: 'Зняття м’язового тонусу, покращення кровообігу та лімфотоку, зменшення больових симптомів.',
-    details: 'Сеанси лікувального масажу проводяться за індивідуальними показаннями, допомагають розслабити перевантажені ділянки тіла та підготувати м’язи до активних занять ЛФК.',
+    details: 'Сеанси оздоровчого масажу проводяться за індивідуальними показаннями, допомагають розслабити перевантажені ділянки тіла, покращити лімфоток та підготувати м’язи до активних занять.',
     cases: [
       'М’язові затиски, спазми та біль у спині/шиї',
       'Набряки кінцівок при обмеженому русі',
@@ -86,29 +49,119 @@ const SERVICES_DATA: ServiceItem[] = [
     ]
   },
   {
-    title: 'Фізіотерапевтичні процедури',
-    image: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=600&q=80',
-    short: 'Апаратне лікування (електростимуляція, магнітотерапія, ультразвук) для відновлення тканин.',
-    details: 'Фізіотерапія застосовується як допоміжний засіб для зменшення болю, покращення кровообігу в уражених зонах та активації регенераційних процесів в організмі.',
+    title: 'Фізична реабілітація',
+    image: '/images/physical_therapy.jpg',
+    short: 'Відновлення рухових функцій, сили та балансу після травм і тривалого лікування.',
+    details: 'Програма фізичної реабілітації поєднує лікувальну фізкультуру, мануальні та сучасні методики (DNS, Redcord, фасціальні техніки). Індивідуально підібрані вправи зміцнюють м’язи, покращують координацію та повертають природний обсяг рухів у суглобах.',
     cases: [
-      'Повільне зрощення кісток або сухожиль',
-      'Гострі запальні процеси та набряки м’яких тканин',
-      'Необхідність стимуляції паретичних м’язів струмом',
-      'Потреба у глибокому безболісному прогріванні тканин'
+      'Слабкість м’язів після операцій та тривалого лікування',
+      'Порушення координації рухів та балансу тіла',
+      'Реабілітація після травм хребта та суглобів',
+      'Профілактика болю у спині при сидячому способі життя'
+    ]
+  },
+  {
+    title: 'Йога та тілесні практики',
+    image: '/images/yoga.jpg',
+    short: 'Адаптивна йога та тілесні практики для гнучкості, балансу та свободи руху тіла.',
+    details: 'Заняття поєднують елементи терапевтичної йоги та тілесних практик: індивідуально підібрані асани зміцнюють глибокі м’язи, покращують координацію, гнучкість і відновлюють природний обсяг рухів. Практика підходить для різного рівня підготовки — індивідуально, сімейно або у групі.',
+    cases: [
+      'Скутість та обмежена рухливість тіла',
+      'Біль у спині при сидячому способі життя',
+      'Слабкість глибоких м’язів та порушення постави',
+      'Потреба у відновленні гнучкості та балансу'
+    ]
+  },
+  {
+    title: 'Електровакуумна терапія',
+    image: '/images/electro.jpg',
+    video: '/media/electro_service.mp4',
+    short: 'Поєднання вакуумного впливу та електростимуляції для кровообігу, зняття напруження й відновлення тканин.',
+    details: 'У нашому центрі проводяться фізіотерапевтичні процедури з використанням апарату електровакуумної терапії — сучасного методу впливу на м’язи, суглоби та м’які тканини. Метод поєднує вакуумний вплив і електростимуляцію, завдяки чому покращується місцевий кровообіг, активізуються обмінні процеси та зменшується м’язове напруження. Спеціальні насадки створюють контрольований вакуумний вплив у поєднанні з електричними імпульсами, а інтенсивність підбирається індивідуально. Наша мета — не просто тимчасове полегшення, а комплексна підтримка рухливості, комфорту та відновлення організму.',
+    casesTitle: 'Може застосовуватися:',
+    cases: [
+      'При м’язовому перенапруженні та спазмах',
+      'При болях у спині, шиї та суглобах',
+      'У програмах відновлення після фізичних навантажень',
+      'Для покращення мікроциркуляції та живлення тканин',
+      'Як доповнення до масажу, реабілітації та фізіотерапії'
+    ]
+  },
+  {
+    title: 'Дитяча йога з нейровправами',
+    image: '/images/neuro.jpg',
+    video: '/media/neuro.mp4',
+    short: 'Ігрові заняття для розвитку координації, рівноваги, уваги та впевненого руху дитини.',
+    details: 'Дитяча йога з нейровправами поєднує м’які тілесні вправи, ігри на баланс та нейрогімнастику. Такі заняття розвивають координацію рухів, рівновагу та концентрацію уваги, покращують пам’ять і мовлення. Усе проходить у формі гри, тож дитина займається із задоволенням, зміцнює тіло та вчиться краще керувати своїм рухом і емоціями.',
+    casesTitle: 'Що розвиваємо:',
+    cases: [
+      'Координацію рухів та рівновагу',
+      'Концентрацію та стійкість уваги',
+      'Силу м’язів та правильну поставу',
+      'Пам’ять, мовлення та сприйняття',
+      'Уміння керувати тілом та емоціями'
+    ]
+  },
+  {
+    title: 'Дитячий логопед-дефектолог',
+    image: '/images/speech_therapy.jpg',
+    video: '/media/speech.mp4',
+    poster: '/images/speech_poster.jpg',
+    short: 'Розвиток мовлення, корекція звуковимови та підготовка до школи у м’якій ігровій формі.',
+    details: 'Мовлення — це не лише правильна вимова звуків. Через мову дитина вчиться висловлювати думки, розуміти інших, спілкуватися та впевнено взаємодіяти зі світом. Дитячий логопед-дефектолог допомагає подолати труднощі мовленнєвого та психомовленнєвого розвитку, розвиває навички спілкування, увагу, мислення та мовне сприйняття. Заняття проходять у м’якій ігровій формі з урахуванням віку та особливостей дитини: вправи на мовлення, артикуляцію, дрібну моторику, слухове сприйняття, пам’ять та увагу. Важлива частина роботи — співпраця з батьками, адже підтримка вдома значно підсилює результат занять.',
+    casesTitle: 'З чим ми працюємо:',
+    cases: [
+      'Затримка мовленнєвого розвитку',
+      'Порушення звуковимови',
+      'Труднощі з формуванням слів і речень',
+      'Нерозбірливе мовлення',
+      'Проблеми з читанням і письмом',
+      'Труднощі концентрації та сприйняття інформації',
+      'Розвиток мовлення у дітей з особливостями розвитку',
+      'Підготовка до школи та комунікативні навички'
+    ]
+  },
+  {
+    title: 'Дитячий психолог',
+    image: '/images/psych_card.jpg',
+    video: '/media/psych.mp4',
+    poster: '/images/psych_poster.jpg',
+    short: 'М’яка підтримка дитини через ігрову терапію, творчі практики та роботу з емоціями.',
+    details: 'Дитинство — це період, коли формується характер, самооцінка, відчуття безпеки та довіри до світу. Робота дитячого психолога допомагає дитині м’яко пройти складні етапи розвитку, навчитися виражати свої почуття та будувати здоровий контакт із собою та оточенням. Використовуються лише м’які та безпечні методи: ігрова терапія, бесіда, творчі практики, вправи на емоційне усвідомлення. Для дитини це не «лікування», а простір, де її чують, розуміють і підтримують. Важлива частина роботи — взаємодія з батьками. Наша мета — допомогти дитині рости спокійною, відкритою, впевненою та емоційно стійкою.',
+    casesTitle: 'Допомагаємо при:',
+    cases: [
+      'Труднощах у вираженні емоцій та почуттів',
+      'Підвищеній тривожності та страхах',
+      'Складних етапах розвитку та адаптації',
+      'Проблемах у спілкуванні з однолітками',
+      'Зниженій самооцінці та невпевненості',
+      'Потребі підтримки батьків у вихованні'
     ]
   }
 ];
 
 const SERVICE_OPTIONS = [
-  'Консультація реабілітолога',
-  'Фізична терапія (сесія)',
-  'Ерготерапія (сесія)',
-  'Психологічна допомога',
-  'Логопедична допомога',
-  'Лікувальний масаж',
-  'Фізіотерапевтичні процедури',
+  'Східний (тайський) масаж',
+  'Оздоровчий масаж',
+  'Фізична реабілітація',
+  'Йога та тілесні практики',
+  'Електровакуумна терапія',
+  'Дитяча йога з нейровправами',
+  'Дитячий логопед-дефектолог',
+  'Дитячий психолог',
   'Інше / Комплексна програма'
 ];
+
+const CAT: Record<string, string> = {
+  'Східний (тайський) масаж': 'Масаж',
+  'Оздоровчий масаж': 'Масаж',
+  'Фізична реабілітація': 'Реабілітація',
+  'Йога та тілесні практики': 'Йога',
+  'Електровакуумна терапія': 'Апарат',
+  'Дитяча йога з нейровправами': 'Діти',
+  'Дитячий логопед-дефектолог': 'Логопедія',
+  'Дитячий психолог': 'Психологія',
+};
 
 interface Props {
   embedded?: boolean;
@@ -117,14 +170,70 @@ interface Props {
 const Services: React.FC<Props> = ({ embedded = false }) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [service, setService] = useState(SERVICE_OPTIONS[0]);
+  const [specialist, setSpecialist] = useState<string>(SPECIALISTS[0]);
+  const [preferredDate, setPreferredDate] = useState<string>('');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  const preferredDates = React.useMemo(() => {
+    const daysUk = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    const monthsUk = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+    const list: string[] = ['Найближчий вільний день (узгодити)'];
+    const now = new Date();
+    for (let i = 0; i < 14 && list.length < 8; i++) {
+      const d = new Date(now);
+      d.setDate(now.getDate() + i);
+      if (d.getDay() !== 0) {
+        list.push(`${daysUk[d.getDay()]}, ${d.getDate()} ${monthsUk[d.getMonth()]}`);
+      }
+    }
+    return list;
+  }, []);
+
   // Selected service for detail modal
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
+
+  // Послуги з бази (редагуються в адмінці); фолбек — SERVICES_DATA.
+  const [services, setServices] = useState<ServiceItem[]>(SERVICES_DATA);
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase.rpc('rps_services_list');
+      const rows = (data as Array<Record<string, unknown>> | null) || [];
+      if (error || rows.length === 0) return;
+      setServices(rows.map((r) => ({
+        title: String(r.title || ''),
+        category: (r.category as string) || undefined,
+        image: (r.image_url as string) || '',
+        video: (r.video_url as string) || undefined,
+        poster: (r.poster_url as string) || undefined,
+        short: (r.short as string) || '',
+        details: (r.details as string) || '',
+        casesTitle: (r.cases_title as string) || undefined,
+        cases: String(r.cases || '').split('\n').map((c) => c.trim()).filter(Boolean),
+      })));
+    })();
+  }, []);
+
+  // Якщо прийшли сюди через кнопку «Записатися» — плавно прокрутити до форми.
+  useEffect(() => {
+    let flagged = false;
+    try {
+      flagged = sessionStorage.getItem('rps_scroll_book') === '1';
+      if (flagged) sessionStorage.removeItem('rps_scroll_book');
+    } catch {
+      /* ignore */
+    }
+    if (flagged) {
+      const t = setTimeout(() => {
+        document.getElementById('book-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 250);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   const submit = async () => {
     setErr(null);
@@ -132,16 +241,29 @@ const Services: React.FC<Props> = ({ embedded = false }) => {
       setErr("Вкажіть ім'я та телефон");
       return;
     }
+    if (email.trim() && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
+      setErr('Вкажіть коректний e-mail або залиште поле порожнім');
+      return;
+    }
     setBusy(true);
+    const dateChoice = preferredDate || preferredDates[0];
+    const fullNote = `Спеціаліст: ${specialist}\nБажана дата: ${dateChoice}${note.trim() ? `\nКоментар: ${note.trim()}` : ''}`;
     const { error } = await supabase.rpc('rps_book', {
       p_name: name,
       p_phone: phone,
       p_service: service,
-      p_note: note,
+      p_note: fullNote,
+      p_email: email.trim() || null,
     });
     setBusy(false);
-    if (error) setErr('Не вдалося відправити. Спробуйте ще раз.');
-    else setDone(true);
+    if (error) { setErr('Не вдалося відправити. Спробуйте ще раз.'); return; }
+    setDone(true);
+    // Лист-підтвердження клієнту + сповіщення власнику (fire-and-forget).
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'booking', name, phone, email: email.trim(), service, date: dateChoice, note: fullNote }),
+    }).catch(() => {});
   };
 
   const openBookingFor = (serviceName: string) => {
@@ -165,94 +287,98 @@ const Services: React.FC<Props> = ({ embedded = false }) => {
     <Wrapper className={embedded ? '' : 'mx-auto max-w-5xl px-5 pb-20 pt-12 sm:pt-16'}>
       {!embedded && (
         <div className="text-center mb-10">
-          <span className="eyebrow">🤲 Наші послуги</span>
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Послуги та напрямки відновлення</h1>
-          <p className="mx-auto mt-3 max-w-xl text-slate-500 text-sm">Оберіть напрямок реабілітації для отримання кваліфікованої допомоги.</p>
+          <span className="eyebrow">Наші послуги</span>
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Послуги та напрямки</h1>
+          <p className="mx-auto mt-3 max-w-xl text-slate-500 text-sm">Оберіть напрямок реабілітації або одразу залиште заявку — підберемо програму під вас.</p>
+          <button
+            onClick={() => document.getElementById('book-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="shine mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-200 transition hover:bg-emerald-700"
+          >
+            <CalendarCheck className="h-5 w-5" /> Записатися на прийом
+          </button>
         </div>
       )}
 
-      {/* Grid of 7 services + 1 extra card */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {SERVICES_DATA.map((item, idx) => (
-          <motion.div
+      {/* Преміум-сітка послуг — image-forward картки */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+        {services.map((item, idx) => (
+          <motion.button
             key={item.title}
-            initial={{ opacity: 0, y: 15 }}
+            onClick={() => setSelectedService(item)}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "0px 0px -20px 0px" }}
+            viewport={{ once: true, margin: '0px 0px -20px 0px' }}
             transition={{ duration: 0.45, delay: idx * 0.05 }}
-            whileHover={{ y: -4 }}
-            className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition-all hover:shadow-md hover:shadow-emerald-900/5"
+            className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-3xl text-left shadow-sm ring-1 ring-slate-200/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-900/10 hover:ring-emerald-300"
           >
-            <div>
-              {/* Image box */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
-                <SmartImage
-                  src={item.image}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  fallback={
-                    <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
-                      📷
-                    </div>
-                  }
-                />
-              </div>
+            <SmartImage
+              src={item.image}
+              alt={item.title}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              fallback={
+                <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-emerald-100 to-teal-50 text-slate-400">
+                  📷
+                </div>
+              }
+            />
+            {/* Затемнення знизу для читабельності */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/92 via-slate-950/30 to-transparent" />
 
-              {/* Text */}
-              <div className="p-5">
-                <h3 className="text-base font-bold text-slate-900 line-clamp-2 leading-snug">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-slate-500 line-clamp-3">
-                  {item.short}
-                </p>
-              </div>
-            </div>
+            {/* Категорія + бейдж відео */}
+            <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-700 shadow-sm backdrop-blur">
+              {item.category || CAT[item.title]}
+            </span>
+            {item.video && (
+              <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald-600/95 px-2.5 py-1 text-[10px] font-bold text-white shadow-sm backdrop-blur">
+                <Play className="h-3 w-3 fill-white" /> Відео
+              </span>
+            )}
 
-            {/* CTA row */}
-            <div className="px-5 pb-5">
-              <button
-                onClick={() => setSelectedService(item)}
-                className="flex w-full items-center justify-center gap-1 rounded-xl bg-slate-50 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800"
-              >
-                Докладніше <ArrowRight className="h-3.5 w-3.5" />
-              </button>
+            {/* Текст */}
+            <div className="relative z-10 p-3 sm:p-4">
+              <h3 className="text-[13px] font-extrabold leading-tight text-white drop-shadow-sm sm:text-base">
+                {item.title}
+              </h3>
+              <p className="mt-1 line-clamp-2 text-[10px] leading-relaxed text-white/75 sm:mt-1.5 sm:text-[11px]">{item.short}</p>
+              <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 sm:mt-3 sm:text-[11px]">
+                Докладніше <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform group-hover:translate-x-1" />
+              </span>
             </div>
-          </motion.div>
+          </motion.button>
         ))}
 
-        {/* 8th Card: More services link */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
+        {/* Картка консультації — на всю ширину */}
+        <motion.button
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "0px 0px -20px 0px" }}
-          transition={{ duration: 0.45, delay: 7 * 0.05 }}
-          whileHover={{ y: -4 }}
+          viewport={{ once: true, margin: '0px 0px -20px 0px' }}
+          transition={{ duration: 0.45, delay: 8 * 0.05 }}
           onClick={() => {
-            const el = document.getElementById('consultation-section');
+            const el = document.getElementById('consultation-section') || document.getElementById('book-section');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }}
-          className="group flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-600 p-6 text-white shadow-md shadow-emerald-200/40 hover:from-emerald-700 hover:to-teal-700"
+          className="group col-span-2 lg:col-span-1 relative flex flex-row items-center gap-4 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-600 p-5 text-left text-white shadow-md shadow-emerald-200/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl lg:flex-col lg:aspect-[3/4] lg:justify-between lg:gap-0"
         >
-          <div className="flex flex-col justify-between h-full min-h-[160px]">
-            <div>
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
-                <CalendarCheck className="h-5 w-5" />
-              </span>
-              <h3 className="mt-6 text-lg font-extrabold leading-tight">
-                Отримати консультацію реабілітолога
-              </h3>
-              <p className="mt-2 text-xs text-emerald-100 leading-relaxed">
-                Допоможемо розібратися зі станом пацієнта та скласти покроковий план відновлення.
-              </p>
-            </div>
-            <div className="mt-6 flex items-center justify-between text-xs font-bold border-t border-white/10 pt-4">
+          <div className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <span className="relative inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20 lg:h-11 lg:w-11">
+            <CalendarCheck className="h-5 w-5" />
+          </span>
+          <div className="relative flex-1">
+            <h3 className="text-sm font-extrabold leading-tight sm:text-lg">Безкоштовна консультація</h3>
+            <p className="mt-1 text-[11px] leading-relaxed text-emerald-50 sm:text-xs">
+              Допоможемо розібратися зі станом та скласти покроковий план відновлення.
+            </p>
+            <div className="mt-2 flex items-center gap-1 text-[11px] font-bold sm:text-xs">
               <span>Залишити опис стану</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
             </div>
           </div>
-        </motion.div>
+        </motion.button>
       </div>
+
+      {/* Відео-підрозділи та прайс — на головній рендеряться окремо, тут лише на сторінці «Послуги» */}
+      {!embedded && <MediaShowcase />}
+      {!embedded && <PriceList />}
 
       {/* Booking Form Section */}
       <motion.div
@@ -294,7 +420,16 @@ const Services: React.FC<Props> = ({ embedded = false }) => {
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
               />
             </div>
-            
+
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              inputMode="email"
+              placeholder="E-mail (надішлемо підтвердження)"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+            />
+
             <select
               value={service}
               onChange={(e) => setService(e.target.value)}
@@ -304,11 +439,31 @@ const Services: React.FC<Props> = ({ embedded = false }) => {
                 <option key={s}>{s}</option>
               ))}
             </select>
-            
+
+            <select
+              value={specialist}
+              onChange={(e) => setSpecialist(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+            >
+              {SPECIALISTS.map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+
+            <select
+              value={preferredDate}
+              onChange={(e) => setPreferredDate(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 outline-none focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+            >
+              {preferredDates.map((d) => (
+                <option key={d} value={d}>📅 {d}</option>
+              ))}
+            </select>
+
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Опишіть скарги або побажання (необов'язково)"
+              placeholder="Зручний день і час + скарги/побажання (адміністратор підтвердить запис)"
               rows={3}
               className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
             />
@@ -322,6 +477,12 @@ const Services: React.FC<Props> = ({ embedded = false }) => {
             >
               {busy ? 'Відправляємо заявку…' : 'Записатися на прийом'}
             </button>
+            <a
+              href="tel:+380638069916"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 py-3.5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100 hover:border-emerald-300"
+            >
+              <Phone className="h-4 w-4" /> Подзвонити
+            </a>
           </div>
         )}
       </motion.div>
@@ -337,59 +498,89 @@ const Services: React.FC<Props> = ({ embedded = false }) => {
             className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
           >
             <motion.div
-              initial={{ scale: 0.95, y: 15 }}
+              initial={{ scale: 0.96, y: 16 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 15 }}
+              exit={{ scale: 0.96, y: 16 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-100"
+              className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-100 md:flex-row"
             >
-              {/* Header Image box */}
-              <div className="relative aspect-[21/9] w-full overflow-hidden bg-slate-100">
-                <SmartImage
-                  src={selectedService.image}
-                  alt={selectedService.title}
-                  className="h-full w-full object-cover"
-                  fallback={
-                    <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
-                      📷
-                    </div>
-                  }
+              {/* Медіа-колонка — медіа показується ПОВНІСТЮ (object-contain),
+                  а простір довкола заповнює розмитий фон. Нічого не обрізається. */}
+              <div className="relative w-full shrink-0 overflow-hidden bg-slate-950 md:w-[44%]">
+                {/* Розмитий фон із того ж кадру */}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 scale-125 bg-cover bg-center opacity-40 blur-2xl"
+                  style={{ backgroundImage: `url(${selectedService.poster || selectedService.image})` }}
                 />
+                <div className="relative h-[46vh] w-full sm:h-[52vh] md:h-full md:min-h-[440px]">
+                  {selectedService.video ? (
+                    <video
+                      key={selectedService.video}
+                      src={selectedService.video}
+                      poster={selectedService.poster || selectedService.image}
+                      className="absolute inset-0 h-full w-full object-contain"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      controls
+                      preload="metadata"
+                    />
+                  ) : (
+                    <SmartImage
+                      src={selectedService.poster || selectedService.image}
+                      alt={selectedService.title}
+                      className="absolute inset-0 h-full w-full object-contain"
+                      fallback={
+                        <div className="absolute inset-0 flex items-center justify-center text-slate-300">📷</div>
+                      }
+                    />
+                  )}
+                </div>
+                <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-700 shadow-sm backdrop-blur">
+                  {selectedService.category || CAT[selectedService.title] || 'Послуга'}
+                </span>
                 <button
                   onClick={() => setSelectedService(null)}
-                  className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-slate-950/40 text-white backdrop-blur transition hover:bg-slate-950/65"
+                  className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-slate-950/50 text-white backdrop-blur transition hover:bg-slate-950/75 md:hidden"
                   aria-label="Закрити"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Modal Body */}
-              <div className="p-6">
-                <h3 className="text-xl font-extrabold text-slate-900 leading-tight">
-                  {selectedService.title}
-                </h3>
-                <p className="mt-4 text-sm leading-relaxed text-slate-600">
-                  {selectedService.details}
-                </p>
-
-                {/* Cases / Indications */}
-                <div className="mt-6">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                    Показання та випадки лікування:
-                  </h4>
-                  <ul className="grid gap-2 sm:grid-cols-2">
-                    {selectedService.cases.map((cs) => (
-                      <li key={cs} className="flex items-start gap-2 text-xs text-slate-600">
-                        <span className="mt-1 flex h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
-                        <span>{cs}</span>
-                      </li>
-                    ))}
-                  </ul>
+              {/* Контент-колонка */}
+              <div className="flex min-h-0 flex-1 flex-col">
+                <div className="flex items-start justify-between gap-3 p-6 pb-3">
+                  <h3 className="text-xl font-extrabold leading-tight text-slate-900">{selectedService.title}</h3>
+                  <button
+                    onClick={() => setSelectedService(null)}
+                    className="hidden h-9 w-9 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 md:grid"
+                    aria-label="Закрити"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
 
-                {/* Modal Footer */}
-                <div className="mt-8 flex items-center justify-end gap-3 border-t border-slate-50 pt-4">
+                <div className="min-h-0 flex-1 overflow-y-auto px-6">
+                  <p className="text-sm leading-relaxed text-slate-600">{selectedService.details}</p>
+                  <div className="mt-6">
+                    <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      {selectedService.casesTitle || 'Показання та випадки лікування:'}
+                    </h4>
+                    <ul className="grid gap-2 sm:grid-cols-2">
+                      {selectedService.cases.map((cs) => (
+                        <li key={cs} className="flex items-start gap-2 text-xs text-slate-600">
+                          <span className="mt-1 flex h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                          <span>{cs}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 border-t border-slate-100 p-4">
                   <button
                     onClick={() => setSelectedService(null)}
                     className="rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-50"

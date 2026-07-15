@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Публічні (anon) ключі Supabase — безпечно тримати в клієнті, доступ обмежено RLS.
-const SUPABASE_URL = 'https://ewtybyrtdvhibdtdvrmq.supabase.co';
+const SUPABASE_URL = 'https://fjrkvxzuwihogmwfpnnt.supabase.co';
 const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3dHlieXJ0ZHZoaWJkdGR2cm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzI5ODcsImV4cCI6MjA5MTA0ODk4N30.VjWnmvh8tw1GSIBJYWbJ8o5dYBkCj5pOUj2zoTPHmyg';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqcmt2eHp1d2lob2dtd2Zwbm50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjQwNDQsImV4cCI6MjA5ODE0MDA0NH0.TK3qk9J3b7MhqZYOYcpQADwR7Ps6wvD4WWnW8mAdr6g';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   realtime: { params: { eventsPerSecond: 10 } },

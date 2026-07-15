@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { HeartPulse, Dumbbell, GraduationCap, CalendarCheck, ArrowRight } from 'lucide-react';
-import { navigate } from '../../hooks/useRoute';
+import { goToBooking } from '../../hooks/useRoute';
 import PhotoFrame from '../PhotoFrame';
 
 const directions = [
@@ -126,10 +126,10 @@ const About: React.FC<Props> = ({ embedded = false }) => {
           Оберіть послугу та залиште контакти - я зв'яжуся з вами, щоб підібрати зручний час.
         </p>
         <button
-          onClick={() => navigate('services')}
+          onClick={goToBooking}
           className="mt-1 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50"
         >
-          Послуги та запис <ArrowRight className="h-4 w-4" />
+          Записатися на прийом <ArrowRight className="h-4 w-4" />
         </button>
       </motion.div>
     </Wrapper>

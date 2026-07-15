@@ -1,0 +1,50 @@
+<svg width="1440" height="520" viewBox="0 0 1440 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="104" y1="52" x2="1337" y2="472" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F766E"/>
+      <stop offset="0.52" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+    <radialGradient id="g2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1184 120) rotate(180) scale(196 196)">
+      <stop stop-color="#BAF7E7" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#BAF7E7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g3" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(220 416) rotate(13.5) scale(238 238)">
+      <stop stop-color="#F0FDF4" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#F0FDF4" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="170" y="102" width="1100" height="316" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="18"/>
+      <feGaussianBlur stdDeviation="24"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.0470588 0 0 0 0 0.109804 0 0 0 0 0.184314 0 0 0 0.16 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+  <rect width="1440" height="520" rx="36" fill="url(#g1)"/>
+  <circle cx="1184" cy="120" r="196" fill="url(#g2)"/>
+  <circle cx="220" cy="416" r="238" fill="url(#g3)"/>
+  <path d="M0 402C176 338 286 360 446 316C641 262 722 128 950 126C1114 124 1248 182 1440 102V520H0V402Z" fill="white" fill-opacity="0.08"/>
+  <g filter="url(#shadow)">
+    <rect x="240" y="116" width="960" height="288" rx="34" fill="white" fill-opacity="0.14" stroke="white" stroke-opacity="0.18"/>
+    <rect x="286" y="160" width="430" height="200" rx="28" fill="white" fill-opacity="0.92"/>
+    <rect x="756" y="160" width="398" height="200" rx="28" fill="#0F172A" fill-opacity="0.18"/>
+    <rect x="316" y="188" width="200" height="22" rx="11" fill="#0F766E" fill-opacity="0.16"/>
+    <rect x="316" y="225" width="290" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="316" y="250" width="248" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="316" y="286" width="154" height="46" rx="16" fill="#059669"/>
+    <text x="393" y="315" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="800" fill="white">Курс відкрито</text>
+    <circle cx="886" cy="230" r="48" fill="white" fill-opacity="0.16"/>
+    <path d="M886 194L897 218H922L901 233L909 257L886 242L863 257L871 233L850 218H875L886 194Z" fill="#FBBF24" fill-opacity="0.92"/>
+    <circle cx="992" cy="246" r="38" fill="white" fill-opacity="0.10"/>
+    <circle cx="1060" cy="236" r="22" fill="white" fill-opacity="0.14"/>
+    <circle cx="1036" cy="300" r="16" fill="white" fill-opacity="0.12"/>
+    <path d="M824 320C872 292 958 292 1030 320" stroke="white" stroke-opacity="0.38" stroke-width="8" stroke-linecap="round"/>
+    <path d="M832 282H1048" stroke="white" stroke-opacity="0.25" stroke-width="6" stroke-linecap="round"/>
+    <path d="M832 258H990" stroke="white" stroke-opacity="0.18" stroke-width="6" stroke-linecap="round"/>
+    <path d="M824 350H1016" stroke="white" stroke-opacity="0.18" stroke-width="6" stroke-linecap="round"/>
+    <rect x="772" y="172" width="104" height="16" rx="8" fill="#E2E8F0" fill-opacity="0.4"/>
+  </g>
+</svg>

@@ -38,3 +38,12 @@ npm run preview
 
 Проєкт готовий до деплою на **Vercel** (фреймворк визначається автоматично:
 build → `vite build`, output → `dist`).
+
+## Email for course purchases
+
+Для підтверджувальних листів після покупки курсу потрібні змінні оточення:
+
+- `GMAIL_USER`
+- `GMAIL_APP_PASSWORD`
+- `GMAIL_FROM` (необов'язково)
+- `COURSE_SUPPORT_EMAIL` (необов'язково)
